@@ -283,6 +283,17 @@ impl InstantVector {
         &self.sample
     }
 
+    /// Returns a mutable reference to the set of labels (+ metric name)
+    /// of this time series.
+    pub fn metric_mut(&mut self) -> &mut HashMap<String, String> {
+        &mut self.metric
+    }
+
+    /// Returns a mutable reference to the sample of this time series.
+    pub fn sample_mut(&mut self) -> &mut Sample {
+        &mut self.sample
+    }
+
     /// Returns the inner types when ownership is required
     pub fn into_inner(self) -> (HashMap<String, String>, Sample) {
         (self.metric, self.sample)
