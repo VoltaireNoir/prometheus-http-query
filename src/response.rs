@@ -1,7 +1,7 @@
 //! All types that are returned when querying the Prometheus API.
 use crate::util::{AlertState, RuleHealth, TargetHealth};
 use enum_as_inner::EnumAsInner;
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::fmt;
 use time::{Duration, OffsetDateTime, PrimitiveDateTime};
@@ -134,7 +134,7 @@ pub(crate) enum ApiResponse<D> {
     Error(crate::error::PrometheusError),
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Stats {
     timings: Timings,
     samples: Samples,
@@ -150,7 +150,7 @@ impl Stats {
     }
 }
 
-#[derive(Debug, Copy, Clone, Deserialize)]
+#[derive(Debug, Copy, Clone, Deserialize, Serialize)]
 pub struct Timings {
     #[serde(alias = "evalTotalTime")]
     eval_total_time: f64,
@@ -192,7 +192,7 @@ impl Timings {
     }
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Samples {
     #[serde(alias = "totalQueryableSamplesPerStep")]
     total_queryable_samples_per_step: Option<Vec<Sample>>,
@@ -216,7 +216,7 @@ impl Samples {
     }
 }
 
-#[derive(Debug, Clone, Deserialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct PromqlResult {
     #[serde(flatten)]
     pub(crate) data: Data,
@@ -241,7 +241,7 @@ impl PromqlResult {
 }
 
 /// A wrapper for possible result types of expression queries ([`Client::query`](crate::Client::query) and [`Client::query_range`](crate::Client::query_range)).
-#[derive(Clone, Debug, Deserialize, EnumAsInner)]
+#[derive(Clone, Debug, Deserialize, Serialize, EnumAsInner)]
 #[serde(tag = "resultType", content = "result")]
 pub enum Data {
     #[serde(alias = "vector")]
@@ -264,7 +264,7 @@ impl Data {
 }
 
 /// A single time series containing a single data point/sample.
-#[derive(Clone, Debug, PartialEq, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct InstantVector {
     pub(crate) metric: HashMap<String, String>,
     #[serde(alias = "value")]
@@ -290,7 +290,7 @@ impl InstantVector {
 }
 
 /// A single time series containing a range of data points/samples.
-#[derive(Clone, Debug, PartialEq, Deserialize)]
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct RangeVector {
     pub(crate) metric: HashMap<String, String>,
     #[serde(alias = "values")]
@@ -316,7 +316,7 @@ impl RangeVector {
 }
 
 /// A single data point.
-#[derive(Clone, Copy, Debug, PartialEq, Deserialize)]
+#[derive(Clone, Copy, Debug, PartialEq, Deserialize, Serialize)]
 pub struct Sample {
     pub(crate) timestamp: f64,
     #[serde(deserialize_with = "de::deserialize_f64")]
