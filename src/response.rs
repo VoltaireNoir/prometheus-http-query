@@ -85,7 +85,7 @@ mod de {
         let mut duration_iter = raw_str.chars().peekable();
 
         while let Some(item) = duration_iter.next() {
-            if ('0'..='9').contains(&item) {
+            if item.is_ascii_digit() {
                 raw_num.push(item);
                 continue;
             }
@@ -344,6 +344,16 @@ impl Sample {
     pub fn value(&self) -> f64 {
         self.value
     }
+
+    /// Returns a mutable reference to the timestamp contained in this sample.
+    pub fn timestamp_mut(&mut self) -> &mut f64 {
+        &mut self.timestamp
+    }
+
+    /// Returns a mutable reference to the value contained in this sample.
+    pub fn value_mut(&mut self) -> &mut f64 {
+        &mut self.value
+    }
 }
 
 /// Collection of active and dropped targets as returned by the API.
@@ -539,14 +549,14 @@ pub enum Rule {
 impl Rule {
     pub fn as_recording(&self) -> Option<&RecordingRule> {
         match self {
-            Self::Recording(rule) => Some(&rule),
+            Self::Recording(rule) => Some(rule),
             _ => None,
         }
     }
 
     pub fn as_alerting(&self) -> Option<&AlertingRule> {
         match self {
-            Self::Alerting(rule) => Some(&rule),
+            Self::Alerting(rule) => Some(rule),
             _ => None,
         }
     }
